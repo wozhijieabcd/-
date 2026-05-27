@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="shell(menu, content)">
+    <nav class="admin-topbar d-flex align-items-center px-4 fixed-top shadow-sm">
+        <span class="fw-bold fs-5" style="color: var(--primary);"><i class="bi bi-journal-text"></i> 博客后台</span>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <span class="text-muted" sec:authorize="isAuthenticated()">
+                <i class="bi bi-person-circle"></i>
+                <span sec:authentication="principal.nickname">用户</span>
+            </span>
+            <a href="/" class="btn btn-sm btn-outline-secondary">返回前台</a>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-outline-danger">退出</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="d-flex" style="padding-top: 56px;">
+        <aside class="admin-sidebar py-3" style="position: fixed; top: 56px; bottom: 0; overflow-y: auto;">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/dashboard}"
+                       th:classappend="${menu == 'dashboard'} ? 'active'">
+                        <i class="bi bi-speedometer2 me-2"></i>仪表盘
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/articles}"
+                       th:classappend="${menu == 'articles'} ? 'active'">
+                        <i class="bi bi-file-text me-2"></i>文章管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/categories}"
+                       th:classappend="${menu == 'categories'} ? 'active'">
+                        <i class="bi bi-folder me-2"></i>分类管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/comments}"
+                       th:classappend="${menu == 'comments'} ? 'active'">
+                        <i class="bi bi-chat-dots me-2"></i>评论管理
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="flex-grow-1 p-4" style="margin-left: 240px; background: #f8fafc; min-height: calc(100vh - 56px);">
+            <th:block th:replace="${content}"></th:block>
+        </main>
+    </div>
+</th:block>
+</html>

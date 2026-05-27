@@ -1,0 +1,86 @@
+# =============================================
+# 个人博客系统 - 应用配置
+# =============================================
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: blog
+
+  # ---- 数据源 / HikariCP 连接池 ----
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 30000
+
+  # ---- Redis (缓存 / Session) ----
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  # ---- Thymeleaf 模板引擎 ----
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    cache: false           # 开发阶段关闭缓存
+    prefix: classpath:/templates/
+    suffix: .html
+
+  # ---- 文件上传 ----
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  # ---- Jackson JSON 序列化 ----
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+  # ---- 数据库初始化 ----
+  sql:
+    init:
+      mode: never           # 不自动执行 schema.sql, 手动执行
+      schema-locations: classpath:schema.sql
+      continue-on-error: true
+
+# ---- MyBatis ----
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.blog.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# ---- 日志级别 ----
+logging:
+  level:
+    root: info
+    com.example.blog: debug
+    org.springframework.security: debug

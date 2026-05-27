@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import bcrypt\")",
+      "Bash(python -c \"import bcrypt\")",
+      "Bash(./mvnw dependency:build-classpath -DincludeScope=compile -Dmdep.outputFile=/tmp/cp.txt -q)",
+      "Read(//tmp/**)",
+      "Bash(find /c -name \"java.exe\" -type f 2>/dev/null | head -5; find \"/c/Program Files\" -name \"java.exe\" 2>/dev/null | head -5)",
+      "Read(//c/Program Files/**)",
+      "Bash(pip install *)",
+      "Bash(python -c \"import bcrypt; print\\(bcrypt.hashpw\\(b'admin123', bcrypt.gensalt\\(\\)\\).decode\\(\\)\\)\")",
+      "Bash(export JAVA_HOME=/c/Users/Asus/.jdks/openjdk-26.0.1)",
+      "Bash(/c/Users/Asus/.jdks/openjdk-26.0.1/bin/java --version)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c \"import bcrypt; print\\(bcrypt.hashpw\\(b'admin123', bcrypt.gensalt\\(\\)\\).decode\\(\\)\\)\")",
+      "Bash(rm -rf /d/blog/tmp-class /tmp/GenHash.java /tmp/cp.txt 2>/dev/null; echo \"cleaned\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}

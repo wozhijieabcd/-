@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(${article.title} + ' - 个人博客')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Article content -->
+        <div class="col-lg-8">
+            <article>
+                <header class="mb-4">
+                    <h1 class="fw-bold" th:text="${article.title}">文章标题</h1>
+                    <div class="article-meta mt-3 pb-3 border-bottom">
+                        <span><i class="bi bi-person"></i> <span th:text="${article.user?.nickname}"></span></span>
+                        <span th:if="${article.category?.name}">
+                            <span class="badge badge-category" th:text="${article.category.name}"></span>
+                        </span>
+                        <span><i class="bi bi-calendar3"></i> <span th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span></span>
+                        <span><i class="bi bi-eye"></i> <span th:text="${article.viewCount}">0</span> 阅读</span>
+                    </div>
+                </header>
+
+                <div class="article-content" th:utext="${article.content}">
+                    文章正文内容
+                </div>
+            </article>
+
+            <!-- Comments section -->
+            <section class="mt-5">
+                <h5 class="mb-4"><i class="bi bi-chat-dots"></i> 评论 (<span th:text="${comments != null ? comments.size() : 0}">0</span>)</h5>
+
+                <!-- Comment form -->
+                <div class="card mb-4" sec:authorize="isAuthenticated()">
+                    <div class="card-body">
+                        <form th:action="@{/comment}" method="post">
+                            <input type="hidden" name="articleId" th:value="${article.id}">
+                            <textarea name="content" class="form-control mb-2" rows="3" placeholder="写下你的评论..." required></textarea>
+                            <button type="submit" class="btn btn-primary btn-sm">发表评论</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="alert alert-info" sec:authorize="!isAuthenticated()">
+                    <a href="/login">登录</a> 后即可发表评论
+                </div>
+
+                <!-- Comment list -->
+                <div th:if="${comments != null && !comments.isEmpty()}">
+                    <div th:each="comment : ${comments}" class="comment-item">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:36px;height:36px;font-size:.875rem;"
+                                 th:text="${comment.user?.nickname != null ? #strings.substring(comment.user.nickname, 0, 1) : '?'}">?</div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong th:text="${comment.user?.nickname}" class="me-2"></strong>
+                                    <small class="text-muted" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}"></small>
+                                </div>
+                                <p class="mt-2 mb-0" th:text="${comment.content}"></p>
+                                <!-- Reply form (simplified: reply to parent comment) -->
+                                <button class="btn btn-sm btn-link p-0 mt-1 text-muted" sec:authorize="isAuthenticated()"
+                                        data-bs-toggle="collapse" th:attr="data-bs-target='#replyForm' + ${comment.id}">
+                                    回复
+                                </button>
+                                <div class="collapse mt-2" th:id="'replyForm' + ${comment.id}">
+                                    <form th:action="@{/comment}" method="post">
+                                        <input type="hidden" name="articleId" th:value="${article.id}">
+                                        <input type="hidden" name="parentId" th:value="${comment.id}">
+                                        <textarea name="content" class="form-control mb-2" rows="2" placeholder="写下你的回复..." required></textarea>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">提交回复</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Replies -->
+                        <div th:if="${comment.replies != null && !comment.replies.isEmpty()}" class="comment-reply" th:each="reply : ${comment.replies}">
+                            <div class="d-flex align-items-start gap-2">
+                                <strong th:text="${reply.user?.nickname}" class="me-2"></strong>
+                                <span class="text-danger me-2" th:if="${reply.replyTo != null}">@<span th:text="${reply.replyTo}"></span></span>
+                                <span th:text="${reply.content}"></span>
+                                <small class="text-muted ms-auto flex-shrink-0" th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${comments == null || comments.isEmpty()}" class="empty-state text-center">
+                    <i class="bi bi-chat-square-text" style="font-size: 2.5rem;"></i>
+                    <p class="mt-2">暂无评论，来说两句吧</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="col-lg-4">
+            <div class="card sidebar-card mb-3" th:if="${categories != null && !categories.isEmpty()}">
+                <div class="card-header">文章分类</div>
+                <div class="card-body">
+                    <div class="d-grid gap-1">
+                        <a th:each="cat : ${categories}"
+                           th:href="@{/(categoryId=${cat.id})}"
+                           th:text="${cat.name}"
+                           class="btn btn-sm text-start btn-light"></a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

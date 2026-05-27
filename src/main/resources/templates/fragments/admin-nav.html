@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="admin-layout">
+    <!-- Top bar -->
+    <nav class="admin-topbar d-flex align-items-center px-4 shadow-sm">
+        <span class="fw-bold fs-5" style="color: var(--primary);"><i class="bi bi-journal-text"></i> 博客后台</span>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <span class="text-muted" sec:authorize="isAuthenticated()">
+                <i class="bi bi-person-circle"></i>
+                <span sec:authentication="principal.nickname">用户</span>
+            </span>
+            <a href="/" class="btn btn-sm btn-outline-secondary">返回前台</a>
+            <a href="/logout" class="btn btn-sm btn-outline-danger">退出</a>
+        </div>
+    </nav>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar py-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/dashboard}"
+                       th:classappend="${#strings.contains(menu, 'dashboard')} ? 'active'">
+                        <i class="bi bi-speedometer2 me-2"></i>仪表盘
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/articles}"
+                       th:classappend="${#strings.contains(menu, 'articles')} ? 'active'">
+                        <i class="bi bi-file-text me-2"></i>文章管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/categories}"
+                       th:classappend="${#strings.contains(menu, 'categories')} ? 'active'">
+                        <i class="bi bi-folder me-2"></i>分类管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/comments}"
+                       th:classappend="${#strings.contains(menu, 'comments')} ? 'active'">
+                        <i class="bi bi-chat-dots me-2"></i>评论管理
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="admin-main bg-light min-vh-100">
+            <th:block th:replace="${adminContent} ?: ~{}"></th:block>
+        </main>
+    </div>
+</th:block>
+</html>

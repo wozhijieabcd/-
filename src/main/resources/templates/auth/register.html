@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('注册 - 个人博客')}"></head>
+<body class="d-flex align-items-center justify-content-center min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<div class="card shadow-lg border-0" style="width: 420px; border-radius: 16px;">
+    <div class="card-body p-5">
+        <h3 class="text-center mb-4 fw-bold">注册</h3>
+
+        <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+        <form th:action="@{/register}" method="post">
+            <div class="mb-3">
+                <label class="form-label">用户名</label>
+                <input type="text" name="username" class="form-control" placeholder="请输入用户名" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <input type="password" name="password" class="form-control" placeholder="至少6位密码" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">昵称</label>
+                <input type="text" name="nickname" class="form-control" placeholder="显示名称">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">邮箱</label>
+                <input type="email" name="email" class="form-control" placeholder="选填">
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">注 册</button>
+        </form>
+        <p class="text-center text-muted mb-0">已有账号？<a href="/login">立即登录</a></p>
+        <p class="text-center mt-2"><a href="/" class="text-muted">返回首页</a></p>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

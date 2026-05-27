@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('首页 - 个人博客')}"></head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container mt-4">
+    <!-- Alert -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${success}" th:text="${success}" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row">
+        <!-- Main content -->
+        <div class="col-lg-8">
+            <!-- Top articles -->
+            <div th:if="${topArticles != null && !topArticles.isEmpty()}" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-6" th:each="article : ${topArticles}">
+                        <div class="card article-card h-100">
+                            <div class="card-body">
+                                <span class="top-badge rounded-pill px-2 py-0 mb-2 d-inline-block">置顶</span>
+                                <h6 class="card-title">
+                                    <a th:href="@{/article/{id}(id=${article.id})}" th:text="${article.title}"></a>
+                                </h6>
+                                <div class="article-meta">
+                                    <span><i class="bi bi-person"></i> <span th:text="${article.user?.nickname}"></span></span>
+                                    <span><i class="bi bi-eye"></i> <span th:text="${article.viewCount}">0</span></span>
+                                    <span th:if="${article.category?.name}">
+                                        <span class="badge badge-category" th:text="${article.category.name}"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Article list -->
+            <h5 class="mb-3" th:if="${currentCategoryId != null}">
+                分类: <span class="badge badge-category fs-6" th:text="${articlePage.records[0]?.category?.name} ?: '未知'"></span>
+            </h5>
+
+            <div th:if="${articlePage == null || articlePage.records.isEmpty()}" class="empty-state text-center">
+                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                <p class="mt-3">暂无文章</p>
+            </div>
+
+            <article class="card article-card mb-3" th:each="article : ${articlePage?.records}">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a th:href="@{/article/{id}(id=${article.id})}" th:text="${article.title}"></a>
+                        <span class="top-badge rounded-pill px-2 py-0 ms-2" th:if="${article.isTop == 1}">置顶</span>
+                    </h5>
+                    <p class="text-muted mb-2" th:if="${article.summary}" th:text="${article.summary}"></p>
+                    <div class="article-meta">
+                        <span><i class="bi bi-person"></i> <span th:text="${article.user?.nickname}"></span></span>
+                        <span th:if="${article.category?.name}">
+                            <span class="badge badge-category" th:text="${article.category.name}"></span>
+                        </span>
+                        <span><i class="bi bi-calendar3"></i> <span th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd')}"></span></span>
+                        <span><i class="bi bi-eye"></i> <span th:text="${article.viewCount}">0</span></span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Pagination -->
+            <nav th:if="${articlePage != null && articlePage.totalPages > 1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${articlePage.page == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/(page=${articlePage.page - 1}, categoryId=${currentCategoryId})}">&laquo;</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}"
+                        th:classappend="${i == articlePage.page} ? 'active'">
+                        <a class="page-link" th:href="@{/(page=${i}, categoryId=${currentCategoryId})}" th:text="${i}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${articlePage.page == articlePage.totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/(page=${articlePage.page + 1}, categoryId=${currentCategoryId})}">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="col-lg-4">
+            <div class="card sidebar-card mb-3" th:if="${categories != null && !categories.isEmpty()}">
+                <div class="card-header">文章分类</div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/}" class="btn btn-sm text-start"
+                           th:classappend="${currentCategoryId == null} ? 'btn-primary' : 'btn-light'">全部</a>
+                        <a th:each="cat : ${categories}"
+                           th:href="@{/(categoryId=${cat.id})}"
+                           th:text="${cat.name}"
+                           class="btn btn-sm text-start btn-light"
+                           th:classappend="${currentCategoryId == cat.id} ? 'btn-primary' : 'btn-light'"></a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

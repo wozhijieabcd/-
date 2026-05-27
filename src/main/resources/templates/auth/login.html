@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('登录 - 个人博客')}"></head>
+<body class="d-flex align-items-center justify-content-center min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<div class="card shadow-lg border-0" style="width: 400px; border-radius: 16px;">
+    <div class="card-body p-5">
+        <h3 class="text-center mb-4 fw-bold">登录</h3>
+
+        <div class="alert alert-danger" th:if="${param.error != null}">
+            用户名或密码错误
+        </div>
+        <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+        <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label class="form-label">用户名</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" name="username" class="form-control" placeholder="请输入用户名" required autofocus>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" class="form-control" placeholder="请输入密码" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">登 录</button>
+        </form>
+        <p class="text-center text-muted mb-0">还没有账号？<a href="/register">立即注册</a></p>
+        <p class="text-center mt-2"><a href="/" class="text-muted">返回首页</a></p>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.blog.mapper.ArticleMapper">
+
+    <resultMap id="ArticleResultMap" type="com.example.blog.entity.Article">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="summary" column="summary"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="status" column="status"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="isTop" column="is_top"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <association property="category" javaType="com.example.blog.entity.Category">
+            <result property="name" column="category_name"/>
+        </association>
+        <association property="user" javaType="com.example.blog.entity.User">
+            <result property="username" column="user_username"/>
+            <result property="nickname" column="user_nickname"/>
+            <result property="avatar" column="user_avatar"/>
+        </association>
+    </resultMap>
+
+    <sql id="joinColumns">
+        a.id, a.title, a.content, a.summary, a.category_id, a.user_id,
+        a.status, a.view_count, a.is_top, a.created_at, a.updated_at,
+        c.name AS category_name,
+        u.username AS user_username, u.nickname AS user_nickname, u.avatar AS user_avatar
+    </sql>
+
+    <select id="selectById" resultMap="ArticleResultMap">
+        SELECT <include refid="joinColumns"/>
+        FROM article a
+        LEFT JOIN category c ON a.category_id = c.id
+        LEFT JOIN `user` u ON a.user_id = u.id
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="selectPage" resultMap="ArticleResultMap">
+        SELECT <include refid="joinColumns"/>
+        FROM article a
+        LEFT JOIN category c ON a.category_id = c.id
+        LEFT JOIN `user` u ON a.user_id = u.id
+        <where>
+            <if test="categoryId != null">
+                AND a.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (a.title LIKE CONCAT('%', #{keyword}, '%') OR a.summary LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY a.is_top DESC, a.created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM article a
+        <where>
+            <if test="categoryId != null">
+                AND a.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (a.title LIKE CONCAT('%', #{keyword}, '%') OR a.summary LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="selectTop" resultMap="ArticleResultMap">
+        SELECT <include refid="joinColumns"/>
+        FROM article a
+        LEFT JOIN category c ON a.category_id = c.id
+        LEFT JOIN `user` u ON a.user_id = u.id
+        WHERE a.status = 1 AND a.is_top = 1
+        ORDER BY a.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectByCategoryId" resultMap="ArticleResultMap">
+        SELECT <include refid="joinColumns"/>
+        FROM article a
+        LEFT JOIN category c ON a.category_id = c.id
+        LEFT JOIN `user` u ON a.user_id = u.id
+        WHERE a.category_id = #{categoryId} AND a.status = 1
+        ORDER BY a.created_at DESC
+    </select>
+
+    <update id="updateViewCount">
+        UPDATE article SET view_count = view_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE article SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <insert id="insert" parameterType="com.example.blog.entity.Article" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO article (title, content, summary, category_id, user_id, status, view_count, is_top)
+        VALUES (#{title}, #{content}, #{summary}, #{categoryId}, #{userId},
+                #{status}, #{viewCount}, #{isTop})
+    </insert>
+
+    <update id="update" parameterType="com.example.blog.entity.Article">
+        UPDATE article
+        SET title       = #{title},
+            content     = #{content},
+            summary     = #{summary},
+            category_id = #{categoryId},
+            status      = #{status},
+            is_top      = #{isTop}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM article WHERE id = #{id}
+    </delete>
+
+</mapper>

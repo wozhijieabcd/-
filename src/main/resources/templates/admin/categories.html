@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('分类管理 - 后台管理')}"></head>
+<body>
+<th:block th:replace="~{fragments/admin-layout :: shell('categories', ~{::main})}">
+    <main>
+        <!-- Alerts -->
+        <div class="alert alert-success alert-dismissible fade show" th:if="${success}" th:text="${success}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+        <div class="alert alert-danger alert-dismissible fade show" th:if="${error}" th:text="${error}"><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+
+        <h4 class="mb-4"><i class="bi bi-folder me-2"></i>分类管理</h4>
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white"><strong>添加分类</strong></div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/category}" method="post">
+                            <div class="mb-2">
+                                <label class="form-label">分类名称</label>
+                                <input type="text" name="name" class="form-control" placeholder="分类名称" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">描述</label>
+                                <input type="text" name="description" class="form-control" placeholder="分类描述（选填）">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">排序</label>
+                                <input type="number" name="sortOrder" class="form-control" value="0" style="width:100px;">
+                            </div>
+                            <button type="submit" class="btn btn-primary">添加</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white"><strong>分类列表</strong></div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" th:if="${categories != null && !categories.isEmpty()}">
+                            <thead class="table-light"><tr>
+                                <th>名称</th><th>描述</th><th>排序</th><th style="width:120px;">操作</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr th:each="cat : ${categories}">
+                                    <td><span class="badge badge-category" th:text="${cat.name}"></span></td>
+                                    <td class="text-muted" th:text="${cat.description}"></td>
+                                    <td th:text="${cat.sortOrder}">0</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1"
+                                                data-bs-toggle="modal" data-bs-target="#editModal"
+                                                th:attr="data-id=${cat.id},data-name=${cat.name},data-desc=${cat.description},data-sort=${cat.sortOrder}">
+                                            编辑
+                                        </button>
+                                        <a th:href="@{/admin/category/{id}/delete(id=${cat.id})}" class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('确定删除该分类？')">删除</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:unless="${categories != null && !categories.isEmpty()}" class="text-center py-4 text-muted">暂无分类</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/admin/category}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">编辑分类</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" id="editId">
+                            <div class="mb-3">
+                                <label class="form-label">分类名称</label>
+                                <input type="text" name="name" id="editName" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">描述</label>
+                                <input type="text" name="description" id="editDesc" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">排序</label>
+                                <input type="number" name="sortOrder" id="editSort" class="form-control" style="width:100px;">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</th:block>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+<script>
+    const editModal = document.getElementById('editModal');
+    editModal.addEventListener('show.bs.modal', function(e) {
+        const btn = e.relatedTarget;
+        document.getElementById('editId').value = btn.dataset.id;
+        document.getElementById('editName').value = btn.dataset.name;
+        document.getElementById('editDesc').value = btn.dataset.desc || '';
+        document.getElementById('editSort').value = btn.dataset.sort;
+    });
+</script>
+</body>
+</html>
